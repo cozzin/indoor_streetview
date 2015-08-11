@@ -8,7 +8,8 @@
 #include <conio.h> // 방향키 읽기
 #include <math.h>
 #include <io.h> // 파일 디렉토리 찾기
-#include "graphQS.h"
+
+#include "dijkstraHeader.h"
 
 #include <opencv2\core\core.hpp>
 #include <opencv2\highgui\highgui.hpp>
@@ -77,6 +78,7 @@ Mat slantCorrection(Mat& im);
 
 // 최단 경로
 void shortestPath(int startIdx, int endIdx, pGraph g);
+int V = 53;
 
 // 창 이름
 const char* win_name = "STREET VIEW ver0.1 :: HANDONG";
