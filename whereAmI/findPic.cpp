@@ -330,10 +330,11 @@ void drawArrowAndGps(Mat img, PTS_INFO map, int & in_user_compass){
 	sprintf(yText, "Y :%f", map.y);
 	sprintf(floorText, "Floor : %d", map.floor);
 	sprintf(tagging, "tag : %s", map.tagging);
+
+	putText(img, tagging, Point(img.cols * 4 / 5, img.rows * 6 / 10), FONT_HERSHEY_PLAIN, 1, Scalar(255, 255, 255), 2);
 	putText(img, floorText, Point(img.cols * 4 / 5, img.rows * 7 / 10), FONT_HERSHEY_PLAIN, 1, Scalar(255, 255, 255), 2);
 	putText(img, xText, Point(img.cols * 4 / 5, img.rows * 8 / 10), FONT_HERSHEY_PLAIN, 1, Scalar(255, 255, 255), 2);
 	putText(img, yText, Point(img.cols * 4 / 5, img.rows * 9 / 10), FONT_HERSHEY_PLAIN, 1, Scalar(255, 255, 255), 2);
-	putText(img, tagging, Point(img.cols * 4 / 5, img.rows * 9 / 10), FONT_HERSHEY_PLAIN, 1, Scalar(255, 255, 255), 2);
 }
 
 
