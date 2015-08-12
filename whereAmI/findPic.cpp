@@ -297,8 +297,7 @@ void callBackFunc(int event, int x, int y, int flags, void* userdata){
 void drawArrowAndGps(Mat img, PTS_INFO map, int & in_user_compass){
 
 	// user compass에서 0번 카메라의 나침반을 가져왔다고 생각하면
-
-
+	
 	if (map.direc[in_user_compass % 4] != -1){ // 북
 		arrowedLine(img, Point(img.cols / 2, img.rows / 2), Point(img.cols / 2, img.rows / 2 - 50), Scalar(255, 255, 255), 5);
 	}
@@ -326,14 +325,15 @@ void drawArrowAndGps(Mat img, PTS_INFO map, int & in_user_compass){
 	char xText[MAX_TEXT];
 	char yText[MAX_TEXT];
 	char floorText[MAX_TEXT];
-
+	char tagging[MAX_TEXT];
 	sprintf(xText, "X :%f", map.x);
 	sprintf(yText, "Y :%f", map.y);
 	sprintf(floorText, "Floor : %d", map.floor);
-
+	sprintf(tagging, "tag : %s", map.tagging);
 	putText(img, floorText, Point(img.cols * 4 / 5, img.rows * 7 / 10), FONT_HERSHEY_PLAIN, 1, Scalar(255, 255, 255), 2);
 	putText(img, xText, Point(img.cols * 4 / 5, img.rows * 8 / 10), FONT_HERSHEY_PLAIN, 1, Scalar(255, 255, 255), 2);
 	putText(img, yText, Point(img.cols * 4 / 5, img.rows * 9 / 10), FONT_HERSHEY_PLAIN, 1, Scalar(255, 255, 255), 2);
+	putText(img, tagging, Point(img.cols * 4 / 5, img.rows * 9 / 10), FONT_HERSHEY_PLAIN, 1, Scalar(255, 255, 255), 2);
 }
 
 
