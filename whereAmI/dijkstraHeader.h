@@ -62,5 +62,5 @@ pGraph newGraph(int V);
 void addEdge(pGraph g, int v, int k, double w);
 void printGraph(pGraph g);
 void relax(pGraph G, int u, int v, double w);
-double dijkstra(pGraph G, pq Q, pq S, int s, int endIdx); 
+double dijkstra(pGraph G, pq Q, pq S, int s, int endIdx, int* path);
 pGraph makeGraph(pGraph g);
