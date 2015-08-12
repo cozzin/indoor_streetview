@@ -51,8 +51,8 @@ typedef struct MouseChange{
 double F_dist(double x1, double y1, double x2, double y2); // 두점 거리
 double F_ang(double x1, double y1, double x2, double y2); // 두점 각도
 void makeDirectionMap(PTS_INFO* io_dstMap, int &out_num_pic, char *directionMapFileName, pGraph g); // 관계표 만들기
-void makeTxtFile(PTS_INFO* io_dstMap, char * in_directionMapFileName, int in_pts_num); // 텍스트 파일로 만들기 
-void modifyDirectionMap(PTS_INFO* io_dstMap, char * in_directionMapFileName,int in_pts_num); // 관계표 수정
+void makeTxtFile(PTS_INFO* io_dstMap, char * in_directionMapFileName, int in_pts_num, pGraph g); // 텍스트 파일로 만들기 
+void modifyDirectionMap(PTS_INFO* io_dstMap, char * in_directionMapFileName, int in_pts_num, pGraph g); // 관계표 수정
 int isDirectionMapExist(char* file); // 파일 존재 여부 확인
 void readTextDirectionMap(char * in_directionMapFileName, PTS_INFO*	&io_dstMap, pGraph g); // 관계표 txt 읽어오기
 
@@ -61,12 +61,12 @@ void showRelation(int(*map)[MAX_DIRECTION]); // 콘솔창에 사진간의 관계 보여주기
 void showDirMap(PTS_INFO *dirMap, int in_num_pic); // 콘솔창에 사진간의 관계 보여주기
 String getFileName(PTS_INFO map, int compass); // 숫자 넣으면 .jpg로 만들어주기
 void readText(String fileName, PTS_INFO* &io_dstMap); // 텍스트 파일에서 사진 관계 불러오기
-void slideImage(Mat & io_streetImage, PTS_INFO map, MOUSECHANGE & io_mouse, int & io_user_compass, int in_indexNum); //좌우 화면 전환
+void slideImage(Mat & io_streetImage, PTS_INFO map, MOUSECHANGE & io_mouse, int & io_user_compass, int in_indexNum, int path); //좌우 화면 전환
 
 
 // 스트리트 뷰 화면 컨트롤
 //void drawArrow(Mat img, int map[MAX_DIRECTION]); // 화살표 그리기
-void drawArrowAndGps(Mat img, PTS_INFO mapint, int & in_user_compass);
+void drawArrowAndGps(Mat img, PTS_INFO mapint, int & in_user_compass, int path);
 void callBackFunc(int event, int x, int y, int flags, void* userdata); // 마우스 클릭 이벤트
 
 // 스트리트 뷰 화면 자동 회전
@@ -79,6 +79,7 @@ Mat slantCorrection(Mat& im);
 // 최단 경로
 void shortestPath(int startIdx, int endIdx, pGraph g);
 int V = 53;
+int path[MAX_PICTURE];
 
 // 창 이름
 const char* win_name = "STREET VIEW ver0.1 :: HANDONG";
