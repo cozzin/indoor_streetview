@@ -17,7 +17,7 @@ SURF 정보를 파일에 출력
 @return
 */
 
-#if 0
+#if 1
 void writeSURF(const char* filename, CvSeq* imageKeypoints, CvSeq* imageDescriptors) {
 	fstream fout;
 	fout.open(filename, ios::out);
@@ -49,7 +49,7 @@ void writeSURF(const char* filename, CvSeq* imageKeypoints, CvSeq* imageDescript
 int main(int argc, char** argv) {
 	cv::initModule_nonfree();
 
-	const char* imageFile = argc == 3 ? argv[1] : "lena.png";
+	const char* imageFile = argc == 3 ? argv[1] : "C:\\Users\\OSH\\Documents\\indoor_streetview\\Mark\\mark4.png";
 	const char* surfFile = argc == 3 ? argv[2] : "lena.surf";
 
 	//surf 추출할 영상을 그레이로 읽음
@@ -105,7 +105,7 @@ int main(int argc, char** argv) {
 }
 #endif
 
-#if 1
+#if 0
 int main(int argc, char**argv) {
 	cv::initModule_nonfree();
 	CvCapture* capture;

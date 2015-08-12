@@ -12,19 +12,14 @@ using namespace std;
 int main(int argc, char** argv)
 {
 	//if (argc != 3)	return -1;
-	Mat frame;		
+	Mat frame = imread("C:\\Users\\OSH\\Documents\\indoor_streetview\\Mark\\idx17_camera2.jpg");		
 	Mat img_matches;
 
-	VideoCapture capture(1);
-	if (!capture.isOpened())  return -1;
+
 	
-	Mat logo = imread("box.png");
+	Mat logo = imread("C:\\Users\\OSH\\Documents\\indoor_streetview\\Mark\\mark5.png");
 	if (logo.empty()) return -1;
 	
-	for(;;) {
-		capture.read(frame);
-		capture >> frame;
-
 		// detecting keypoints
 		SurfFeatureDetector detector(5000);
 		vector<KeyPoint> keypoints1, keypoints2;
@@ -46,8 +41,8 @@ int main(int argc, char** argv)
 		drawMatches(frame, keypoints1, logo, keypoints2, matches, img_matches);
 		imshow("matching", img_matches);
 
-		waitKey(10);
-	}
+		waitKey(10000);
+	
 
 	return 0;
 }
