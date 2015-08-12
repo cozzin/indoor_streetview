@@ -99,7 +99,7 @@ void findPairs(CvSeq* keypoints1, CvSeq* descriptors1,
 
 int main(int argc, char** argv) {
 	cv::initModule_nonfree();
-	const char* filename1 = argc == 3 ? argv[1] : "box.jpg";
+	const char* filename1 = argc == 3 ? argv[1] : "C:\\Users\\OSH\\Documents\\indoor_streetview\\Mark\\mark4.png";
 	const char* filename2 = argc == 3 ? argv[2] : "logo.png";
 
 	cvNamedWindow("Keypoint Matching");
