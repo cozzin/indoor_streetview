@@ -51,8 +51,8 @@ typedef struct MouseChange{
 double F_dist(double x1, double y1, double x2, double y2); // 두점 거리
 double F_ang(double x1, double y1, double x2, double y2); // 두점 각도
 void makeDirectionMap(PTS_INFO* io_dstMap, int &out_num_pic, char *directionMapFileName, pGraph g); // 관계표 만들기
-void makeTxtFile(PTS_INFO* io_dstMap, char * in_directionMapFileName, int in_pts_num, pGraph g); // 텍스트 파일로 만들기 
-void modifyDirectionMap(PTS_INFO* io_dstMap, char * in_directionMapFileName, int in_pts_num, pGraph g); // 관계표 수정
+void makeTxtFile(PTS_INFO* io_dstMap, char * in_directionMapFileName, int in_pts_num); // 텍스트 파일로 만들기 
+void modifyDirectionMap(PTS_INFO* io_dstMap, char * in_directionMapFileName,int in_pts_num); // 관계표 수정
 int isDirectionMapExist(char* file); // 파일 존재 여부 확인
 void readTextDirectionMap(char * in_directionMapFileName, PTS_INFO*	&io_dstMap, pGraph g); // 관계표 txt 읽어오기
 
@@ -79,7 +79,6 @@ Mat slantCorrection(Mat& im);
 // 최단 경로
 void shortestPath(int startIdx, int endIdx, pGraph g);
 int V = 53;
-int path[MAX_PICTURE];
 
 // 창 이름
 const char* win_name = "STREET VIEW ver0.1 :: HANDONG";

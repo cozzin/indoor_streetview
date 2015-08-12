@@ -157,7 +157,7 @@ void relax(pGraph G, int u, int v, double w){
 }
 
 //using priority queue ->loop
-double dijkstra(pGraph G, pq Q, pq S, int s, int endIdx, int* path) {
+double dijkstra(pGraph G, pq Q, pq S, int s, int endIdx) {
 	int u = 0;
 
 	if (G->d == NULL) G->d = (double *)malloc(G->V * sizeof(double));
@@ -190,23 +190,13 @@ double dijkstra(pGraph G, pq Q, pq S, int s, int endIdx, int* path) {
 			}
 		}
 	}
-	FILE *f1 = fopen("shortest path.txt", "w");
+	FILE *f1 = fopen("hw5_prob1.txt", "w");
 
 	fprintf(f1, "vertex\tdistance\tproducessor\n");
 	for (int i = 0; i < G->V; i++){
 		fprintf(f1, "%d\t%f\t\t%d\n", i, G->d[i], G->p[i]);
 		printf("%d\t%f\t\t%d\n", i, G->d[i], G->p[i]);
 	}
-
-	int x = -1, i = 0, tmp = 0;
-	while (x != s){
-		if (x == -1)	x = G->p[endIdx];
-		path[i++] = x;
-		x = G->p[x];
-		printf("path[%d] = %d\n", i - 1, path[i - 1]);
-	}
-	path[i] = x;
-	printf("path[%d] = %d\n", i, path[i]);
 	printf("Complete hw5_prob1.txt!\n\n");
 	fclose(f1);
 	
