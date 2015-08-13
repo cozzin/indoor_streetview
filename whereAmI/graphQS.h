@@ -20,6 +20,7 @@ typedef struct Node *pNode;		// a generic node for queue and stack
 typedef struct Node {
 	Key		key;
 	pNode	next;
+	pNode	before;
 } Node;
 
 typedef struct Queue *pQueue;
@@ -66,10 +67,10 @@ void addEdge(pGraph g, int v, int u, double w);	// add two edges, v-w & w-v, to 
 void freeGraph(pGraph g);				// free graph
 void printGraph(pGraph g);				// print the adjacency list of graph
 
-int distTo(pGraph g, int s, int v);		// the number of edges in a shortest path from s to v
+double distTo(pGraph g, int s, int v);		// the number of edges in a shortest path from s to v
 
-void Dijkstra(pGraph g, int u);
-//void PrintTable(pGraph g, FILE *sop);
+void Dijkstra(pGraph g, int u, int startIdx);
+void PrintTable(pGraph g, FILE *sop);
 
 // define the function prototypes for queue and stack
 void	freeNode(pNode curr);			// helper function to free generic nodes

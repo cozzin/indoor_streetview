@@ -23,9 +23,13 @@ int main(){
 	int choice = 0;
 	int user_compass = 0;
 	int startIdx = -1, endIdx = -1;
+	for (int i = 0; i < MAX_PICTURE; i++)
+		path[i] = -1;
 
+	int i = 0;
 	//인덱스 받고 첫화면
 	while ((num_pic < indexNum) || (indexNum < 0) || (choice < 0)){
+		
 		system("cls");
 		printGraph(g);
 		showDirMap(dirMap, num_pic);
@@ -41,7 +45,7 @@ int main(){
 		}
 
 		else if (choice == 1){
-			modifyDirectionMap(dirMap, directionMapFileName, num_pic);   //관계표 수정
+			modifyDirectionMap(dirMap, directionMapFileName, num_pic, g);   //관계표 수정
 		}
 		else if (choice == 2){
 			cout << "출발점과 도착점의 인덱스 번호를 입력해주세요." << endl;
@@ -62,7 +66,7 @@ int main(){
 	MOUSECHANGE mouse;
 	namedWindow(win_name, WINDOW_NORMAL);
 	setMouseCallback(win_name, callBackFunc, &mouse); // 마우스 클릭 이벤트 설정
-	drawArrowAndGps(revisedImage, dirMap[indexNum], user_compass);// 화살표 생성
+	drawArrowAndGps(revisedImage, dirMap[indexNum], user_compass, path[i++]);// 화살표 생성
 	mouse.user_dir = user_compass;
 	imshow(win_name, revisedImage);
 	resizeWindow(win_name, 640, 480);
@@ -82,7 +86,7 @@ int main(){
 			user_compass = mouse.direction;
 			streetImage = imread(getFileName(dirMap[indexNum], user_compass), 1); // 사진 불러오기
 			revisedImage = slantCorrection(streetImage);
-			drawArrowAndGps(revisedImage, dirMap[indexNum], user_compass); // 화살표 생성
+			drawArrowAndGps(revisedImage, dirMap[indexNum], user_compass, path[i++]); // 화살표 생성
 			mouse.user_dir = user_compass;
 			imshow(win_name, revisedImage);
 			mouse.frameSize = revisedImage.size();
@@ -93,7 +97,7 @@ int main(){
 			indexNum = dirMap[indexNum].updown[0];   //indexNUm에 그 사진 index 넣어주기
 			streetImage = imread(getFileName(dirMap[indexNum], user_compass), 1); // 사진 불러오기
 			revisedImage = slantCorrection(streetImage);
-			drawArrowAndGps(revisedImage, dirMap[indexNum], user_compass); // 화살표 생성
+			drawArrowAndGps(revisedImage, dirMap[indexNum], user_compass, path[i++]); // 화살표 생성
 			imshow(win_name, revisedImage);
 			mouse.frameSize = revisedImage.size();
 
@@ -104,14 +108,14 @@ int main(){
 			indexNum = dirMap[indexNum].updown[1];   //indexNUm에 그 사진 index 넣어주기
 			streetImage = imread(getFileName(dirMap[indexNum], user_compass), 1); // 사진 불러오기
 			revisedImage = slantCorrection(streetImage);
-			drawArrowAndGps(revisedImage, dirMap[indexNum], user_compass); // 화살표 생성
+			drawArrowAndGps(revisedImage, dirMap[indexNum], user_compass, path[i++]); // 화살표 생성
 			imshow(win_name, revisedImage);
 			mouse.frameSize = revisedImage.size();
 
 		}
 
 		revisedImage = slantCorrection(streetImage);
-		slideImage(revisedImage, dirMap[indexNum], mouse, user_compass, indexNum); // 왼쪽 오른쪽 UI
+		slideImage(revisedImage, dirMap[indexNum], mouse, user_compass, indexNum, path[i]); // 왼쪽 오른쪽 UI
 
 		mouse.change = 0; // 0으로 바꿔주어 다시 마우스 클릭 됐을 때를 알 수 있도록
 		waitKey(200);
@@ -294,35 +298,57 @@ void callBackFunc(int event, int x, int y, int flags, void* userdata){
 }
 
 //화살표 그려주기
-void drawArrowAndGps(Mat img, PTS_INFO map, int & in_user_compass){
-
+void drawArrowAndGps(Mat img, PTS_INFO map, int & in_user_compass, int path){
 	// user compass에서 0번 카메라의 나침반을 가져왔다고 생각하면
+	/*
+	short ncheck = 0, wcheck = 0, scheck = 0, echeck = 0;
+	if (path != -1){
+		if (map.direc[in_user_compass % 4] != -1 && (map.direc[in_user_compass % 4] == path)){ // 북
+			ncheck = 1;
+			arrowedLine(img, Point(img.cols / 2, img.rows / 2), Point(img.cols / 2, img.rows / 2 - 50), Scalar(0, 255, 255), 5);
+		}
+		if (map.direc[(in_user_compass + 1) % 4] != -1 && (map.direc[(in_user_compass + 1) % 4] == path)){ // 서
+			wcheck = 1;
+			arrowedLine(img, Point(img.cols / 2, img.rows / 2), Point(img.cols / 2 - 100, img.rows / 2), Scalar(0, 255, 255), 5);
 
+		}
+		if (map.direc[(in_user_compass + 2) % 4] != -1 && (map.direc[(in_user_compass + 2) % 4] == path)){ // 남
+			scheck = 1;
+			arrowedLine(img, Point(img.cols / 2, img.rows / 2), Point(img.cols / 2, img.rows / 2 + 50), Scalar(0, 255, 255), 5);
 
-	if (map.direc[in_user_compass % 4] != -1){ // 북
+		}
+		if (map.direc[(in_user_compass + 3) % 4] != -1 && (map.direc[(in_user_compass + 3) % 4] == path)){ // 동
+			echeck = 1;
+			arrowedLine(img, Point(img.cols / 2, img.rows / 2), Point(img.cols / 2 + 100, img.rows / 2), Scalar(0, 255, 255), 5);
+		}
+		
+	}
+	*/
+	if (map.direc[in_user_compass % 4] != -1){ // 북		 && ncheck != 1
 		arrowedLine(img, Point(img.cols / 2, img.rows / 2), Point(img.cols / 2, img.rows / 2 - 50), Scalar(255, 255, 255), 5);
 	}
-	if (map.direc[(in_user_compass + 1) % 4] != -1){ // 서
+	if (map.direc[(in_user_compass + 1) % 4] != -1){ // 서		 && wcheck != 1
 		arrowedLine(img, Point(img.cols / 2, img.rows / 2), Point(img.cols / 2 - 100, img.rows / 2), Scalar(255, 255, 255), 5);
 	}
-	if (map.direc[(in_user_compass + 2) % 4] != -1){ // 남
+	if (map.direc[(in_user_compass + 2) % 4] != -1){ // 남		 && scheck != 1
 		arrowedLine(img, Point(img.cols / 2, img.rows / 2), Point(img.cols / 2, img.rows / 2 + 50), Scalar(255, 255, 255), 5);
 	}
-	if (map.direc[(in_user_compass + 3) % 4] != -1){ // 동
+	if (map.direc[(in_user_compass + 3) % 4] != -1){ // 동		 && echeck != 1
 		arrowedLine(img, Point(img.cols / 2, img.rows / 2), Point(img.cols / 2 + 100, img.rows / 2), Scalar(255, 255, 255), 5);
 	}
 
+	
 	if (map.updown[0] != -1){ // 위
-		arrowedLine(img, Point(img.cols / 2, img.rows * 1 / 10), Point(img.cols / 2, 0), Scalar(0, 255, 255), 5);
+		arrowedLine(img, Point(img.cols / 2, img.rows * 1 / 10), Point(img.cols / 2, 0), Scalar(255, 255, 255), 5);
 		//putText(img, floorText, Point(img.cols * 4 / 5, img.rows * 7 / 10), FONT_HERSHEY_PLAIN, 1, Scalar(255, 255, 255), 2);
 
 	}
 	if (map.updown[1] != -1){ // 아래
-		arrowedLine(img, Point(img.cols / 2, img.rows * 9 / 10), Point(img.cols / 2, img.rows), Scalar(0, 255, 255), 5);
+		arrowedLine(img, Point(img.cols / 2, img.rows * 9 / 10), Point(img.cols / 2, img.rows), Scalar(255, 255, 255), 5);
 		//putText(img, floorText, Point(img.cols * 4 / 5, img.rows * 7 / 10), FONT_HERSHEY_PLAIN, 1, Scalar(255, 255, 255), 2);
 
 	}
-
+	
 	char xText[MAX_TEXT];
 	char yText[MAX_TEXT];
 	char floorText[MAX_TEXT];
@@ -340,7 +366,7 @@ void drawArrowAndGps(Mat img, PTS_INFO map, int & in_user_compass){
 // 좌우 화면 전환
 // 마우스 이벤트, 사용자의 시점을 고려
 // 이미지, 관계정보, 마우스 처리, 사용자 시점, 인덱스
-void slideImage(Mat & io_streetImage, PTS_INFO map, MOUSECHANGE & io_mouse, int & io_user_compass, int in_indexNum){
+void slideImage(Mat & io_streetImage, PTS_INFO map, MOUSECHANGE & io_mouse, int & io_user_compass, int in_indexNum, int path){
 
 	Mat revisedImage;
 	io_streetImage.copyTo(revisedImage);
@@ -351,14 +377,14 @@ void slideImage(Mat & io_streetImage, PTS_INFO map, MOUSECHANGE & io_mouse, int 
 			io_user_compass = N;
 			io_streetImage = imread(getFileName(map, N), 1);
 			revisedImage = slantCorrection(io_streetImage);
-			drawArrowAndGps(revisedImage, map, io_user_compass); // 화살표 생성
+			drawArrowAndGps(revisedImage, map, io_user_compass, path); // 화살표 생성
 			imshow(win_name, revisedImage);
 		}
 		else if (io_user_compass == N){
 			io_user_compass = W;
 			io_streetImage = imread(getFileName(map, W), 1);
 			revisedImage = slantCorrection(io_streetImage);
-			drawArrowAndGps(revisedImage, map, io_user_compass); // 화살표 생성
+			drawArrowAndGps(revisedImage, map, io_user_compass, path); // 화살표 생성
 			imshow(win_name, revisedImage);
 
 		}
@@ -366,7 +392,7 @@ void slideImage(Mat & io_streetImage, PTS_INFO map, MOUSECHANGE & io_mouse, int 
 			io_user_compass = S;
 			io_streetImage = imread(getFileName(map, S), 1);
 			revisedImage = slantCorrection(io_streetImage);
-			drawArrowAndGps(revisedImage, map, io_user_compass); // 화살표 생성
+			drawArrowAndGps(revisedImage, map, io_user_compass, path); // 화살표 생성
 			imshow(win_name, revisedImage);
 
 		}
@@ -374,7 +400,7 @@ void slideImage(Mat & io_streetImage, PTS_INFO map, MOUSECHANGE & io_mouse, int 
 			io_user_compass = E;
 			io_streetImage = imread(getFileName(map, E), 1);
 			revisedImage = slantCorrection(io_streetImage);
-			drawArrowAndGps(revisedImage, map, io_user_compass); // 화살표 생성
+			drawArrowAndGps(revisedImage, map, io_user_compass, path); // 화살표 생성
 			imshow(win_name, revisedImage);
 		}
 		io_mouse.user_dir = io_user_compass;
@@ -388,7 +414,7 @@ void slideImage(Mat & io_streetImage, PTS_INFO map, MOUSECHANGE & io_mouse, int 
 			io_user_compass = S;
 			io_streetImage = imread(getFileName(map, io_user_compass), 1);
 			revisedImage = slantCorrection(io_streetImage);
-			drawArrowAndGps(revisedImage, map, io_user_compass); // 화살표 생성
+			drawArrowAndGps(revisedImage, map, io_user_compass, path); // 화살표 생성
 			imshow(win_name, revisedImage);
 
 		}
@@ -396,14 +422,14 @@ void slideImage(Mat & io_streetImage, PTS_INFO map, MOUSECHANGE & io_mouse, int 
 			io_user_compass = W;
 			io_streetImage = imread(getFileName(map, io_user_compass), 1);
 			revisedImage = slantCorrection(io_streetImage);
-			drawArrowAndGps(revisedImage, map, io_user_compass); // 화살표 생성
+			drawArrowAndGps(revisedImage, map, io_user_compass, path); // 화살표 생성
 			imshow(win_name, revisedImage);
 		}
 		else if (io_user_compass == W){
 			io_user_compass = N;
 			io_streetImage = imread(getFileName(map, io_user_compass), 1);
 			revisedImage = slantCorrection(io_streetImage);
-			drawArrowAndGps(revisedImage, map, io_user_compass); // 화살표 생성
+			drawArrowAndGps(revisedImage, map, io_user_compass, path); // 화살표 생성
 			imshow(win_name, revisedImage);
 
 		}
@@ -411,7 +437,7 @@ void slideImage(Mat & io_streetImage, PTS_INFO map, MOUSECHANGE & io_mouse, int 
 			io_user_compass = E;
 			io_streetImage = imread(getFileName(map, io_user_compass), 1);
 			revisedImage = slantCorrection(io_streetImage);
-			drawArrowAndGps(revisedImage, map, io_user_compass); // 화살표 생성
+			drawArrowAndGps(revisedImage, map, io_user_compass, path); // 화살표 생성
 			imshow(win_name, revisedImage);
 
 		}
@@ -444,11 +470,11 @@ void makeDirectionMap(PTS_INFO* io_dstMap, int &out_num_pic, char * io_direction
 	int i = 0, n = 0, j = 0;
 	int fileExist;
 	//char directionMapFileName[MAX_TEXT] = ""; // char 초기화
-	cout << "관계도를 저장할 텍스트 파일명을 입력해 주세요 (ex.OH123.txt) : ";
+	cout << "관계도를 저장할 텍스트 파일명을 입력해 주세요 (ex.OH.txt) : ";
 	cin >> io_directionMapFileName; // 입력받음
 	fileExist = isDirectionMapExist(io_directionMapFileName); // 파일 존재 여부 확인
 
-	cout << endl << "점의 갯수를 입력하시오 \n" << endl;
+	cout << endl << "점의 갯수를 입력하시오 (오석관일 경우, 53을 입력하십시오.) \n" << endl;
 	cin >> n;
 	out_num_pic = n;
 
@@ -533,14 +559,14 @@ void makeDirectionMap(PTS_INFO* io_dstMap, int &out_num_pic, char * io_direction
 
 
 
-		makeTxtFile(io_dstMap, io_directionMapFileName, out_num_pic);//텍스트 파일로 저장
+		makeTxtFile(io_dstMap, io_directionMapFileName, out_num_pic, g);//텍스트 파일로 저장
 	}
 	else{
 		readTextDirectionMap(io_directionMapFileName, io_dstMap, g);
 	}
 }
 //관계표 텍스트 파일로 만들기 ( 관계도, 관계도 txt 파일명 )
-void makeTxtFile(PTS_INFO* io_dstMap, char * in_directionMapFileName, int in_pts_num){
+void makeTxtFile(PTS_INFO* io_dstMap, char * in_directionMapFileName, int in_pts_num, pGraph g){
 
 	//ofstream outTxt(in_directionMapFileName);
 	FILE *outTxt;
@@ -556,6 +582,10 @@ void makeTxtFile(PTS_INFO* io_dstMap, char * in_directionMapFileName, int in_pts
 		fprintf(outTxt, "%f\t%f\t", io_dstMap[i].updown_length[0], io_dstMap[i].updown_length[1]); // 위 아래 길이
 		fprintf(outTxt, "%f\t%f\t", io_dstMap[i].x, io_dstMap[i].y); // x,y 좌표
 		fprintf(outTxt, "%d\t", io_dstMap[i].floor); // 층
+		addEdgeFromTo(g, i, io_dstMap[i].direc[0], io_dstMap[i].length[0]);
+		addEdgeFromTo(g, i, io_dstMap[i].direc[1], io_dstMap[i].length[1]);
+		addEdgeFromTo(g, i, io_dstMap[i].direc[2], io_dstMap[i].length[2]);
+		addEdgeFromTo(g, i, io_dstMap[i].direc[3], io_dstMap[i].length[3]);
 		if (io_dstMap[i].tagging == NULL)
 			fprintf(outTxt, "%s\t", io_dstMap[i].tagging); // 태깅정보
 		fprintf(outTxt, "\n");
@@ -569,7 +599,7 @@ void makeTxtFile(PTS_INFO* io_dstMap, char * in_directionMapFileName, int in_pts
 }
 
 //관계표 수정 ( 관계도, 관계도 txt 파일명 )
-void modifyDirectionMap(PTS_INFO* io_dstMap, char * in_directionMapFileName, int in_pts_num){
+void modifyDirectionMap(PTS_INFO* io_dstMap, char * in_directionMapFileName, int in_pts_num, pGraph g){
 	char choice = 'y';
 	while (choice == 'y'){
 		int in_index = -1, in_direction = -1, in_pointIndex = -2;
@@ -664,7 +694,7 @@ void modifyDirectionMap(PTS_INFO* io_dstMap, char * in_directionMapFileName, int
 	cout << in_directionMapFileName << "에 저장하시겠습니까? (y/n) : " << endl;
 	cin >> choice;
 	if (choice = 'y'){
-		makeTxtFile(io_dstMap, in_directionMapFileName, in_pts_num);
+		makeTxtFile(io_dstMap, in_directionMapFileName, in_pts_num, g);
 	}
 	cout << "관계도 수정 완료!" << endl;
 }
@@ -1078,7 +1108,9 @@ void shortestPath(int startIdx, int endIdx, pGraph g){
 	for (int i = 0; i < g->V; i++)
 		insert(p, i);
 
-	distance = dijkstra(g, p, S, endIdx, startIdx);
+	distance = dijkstra(g, p, S, endIdx, startIdx, path);
 	cout << startIdx << "부터 " << endIdx << "까지의 거리는 " << distance << " 입니다" << endl;
+	
 	system("pause");
 }
+
