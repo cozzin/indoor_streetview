@@ -8,12 +8,14 @@
 #include <opencv2\opencv.hpp>
 
 #define MAX_TEXT 256
+
 using namespace cv;
 using namespace std;
 
 const char* imageFileName = "C:\\Users\\OSH\\Documents\\indoor_streetview\\Mark\\Mark\\mark%d.png";
-string src = "C:\\Users\\OSH\\Documents\\indoor_streetview\\Mark\\Mark\\idx1_camera1.jpg";
+string src = "C:\\Users\\OSH\\Documents\\indoor_streetview\\Mark\\Mark\\idx0_camera2.jpg";
 
+//1,1 / 14,0 / 16,0 / 17,2 / 21,2 / 39,2 / 39,3 / 41,3 / 44,1 / 
 
 String getFileName(int i) {
 	char buf[MAX_TEXT];
@@ -27,14 +29,21 @@ String getFileName(int i) {
 /** @function main */
 int main(){
 	Mat frame = imread(src);
+	Mat find;
+	double temp;
+	double min;
 
-	for (int i = 1; i<10; i++) {
+	for (int i = 0; i<10; i++) {
 
 		Mat object = imread(getFileName(i));
 		if (object.empty()) { printf("error");  return -1; }
-	
+
+		float a = 0.0;
+		float cnt = 0.0;
+		float b = 0.0;
+
 		//Detect the keypoints using SURF Detector
-		int minHessian = 200;
+		int minHessian = 300;
 		SurfFeatureDetector detector(minHessian);
 		vector<KeyPoint> keypoints_object, keypoints_scene;
 		detector.detect(object, keypoints_object);
@@ -53,64 +62,80 @@ int main(){
 
 		double max_dist = 0; double min_dist = 100;
 		//Quick calculation of max and min distances between keypoints
-		for (int i = 0; i < descriptors_object.rows; i++) {
-			double dist = matches[i].distance;
-			if (dist < min_dist) min_dist = dist;
+		for (int j = 0; j < descriptors_object.rows; j++) {
+			double dist = matches[j].distance;
+			if (dist < min_dist) {
+				min_dist = dist;
+			}
 			if (dist > max_dist) max_dist = dist;
+			a = a + dist;
+			cnt++;
 		}
-
-		printf("-- Max dist : %f \n", max_dist);
-		printf("-- Min dist : %f \n", min_dist);
+		printf("min_dist : %f, max_dist : %f\n", min_dist, max_dist);
+		printf("a : %f, c: %2f => %f\n", (a / cnt));
 
 		//Draw only "good" matches (i.e. whose distance is less than 3*min_dist )
 		vector< DMatch > good_matches;
-		for (int i = 0; i < descriptors_object.rows; i++) {
-			if (matches[i].distance < 3 * min_dist)   {
-				good_matches.push_back(matches[i]);
+		for (int j = 0; j < descriptors_object.rows; j++) {
+			if (matches[j].distance < 3 * min_dist)   {
+				good_matches.push_back(matches[j]);
 			}
 		}	
 
-
 		Mat img_matches;
-		drawMatches(object, keypoints_object, frame, keypoints_scene,
-			good_matches, img_matches, Scalar::all(-1), Scalar::all(-1),
-			vector<char>(), DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS);
-
-			//Localize the object
-			vector<Point2f> obj;
-			vector<Point2f> scene;
-
-			for (int i = 0; i < good_matches.size(); i++) {
-				//Get the keypoints from the good matches
-				obj.push_back(keypoints_object[good_matches[i].queryIdx].pt);
-				scene.push_back(keypoints_scene[good_matches[i].trainIdx].pt);
-			}
-
-
-			Mat H = findHomography(obj, scene, CV_RANSAC);
-			//Finds a perspective transformation between two planes
-
-			//Get the corners from the image_1 ( the object to be "detected" )
-			vector<Point2f> obj_corners(4);
-			obj_corners[0] = cvPoint(0, 0); obj_corners[1] = cvPoint(object.cols, 0);
-			obj_corners[2] = cvPoint(object.cols, object.rows); obj_corners[3] = cvPoint(0, object.rows);
-			vector<Point2f> scene_corners(4);
-
-			perspectiveTransform(obj_corners, scene_corners, H);
-			//Performs the perspective matrix transformation of vectors.
-
-			//Draw lines between the corners (the mapped object in the scene - image_2 )
-			line(img_matches, scene_corners[0] + Point2f(object.cols, 0), scene_corners[1] + Point2f(object.cols, 0), Scalar(0, 255, 255), 2);
-			line(img_matches, scene_corners[1] + Point2f(object.cols, 0), scene_corners[2] + Point2f(object.cols, 0), Scalar(0, 255, 255), 2);
-			line(img_matches, scene_corners[2] + Point2f(object.cols, 0), scene_corners[3] + Point2f(object.cols, 0), Scalar(0, 255, 255), 2);
-			line(img_matches, scene_corners[3] + Point2f(object.cols, 0), scene_corners[0] + Point2f(object.cols, 0), Scalar(0, 255, 255), 2);
-
-			imshow("MatchingResult", img_matches);
-			int key = cvWaitKey(10);
-			if (key == 27) {
-				break;
-			}
+		drawMatches(object, keypoints_object, frame, keypoints_scene, good_matches, img_matches, 
+			Scalar::all(-1), Scalar::all(-1), vector<char>(), DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS);
+		
+		//Localize the object
+		vector<Point2f> obj;
+		vector<Point2f> scene;
+		printf("good_match_size : %d || good_match_cap : %d\n", good_matches.size(), good_matches.capacity());
+		//printf("good_matches ~~ : %d\n");
+		for (int j = 0; j < good_matches.size(); j++) {
+			//Get the keypoints from the good matches
+			obj.push_back(keypoints_object[good_matches[j].queryIdx].pt);
+			scene.push_back(keypoints_scene[good_matches[j].trainIdx].pt);
 		}
 
+		if (good_matches.size() < 4)
+			continue;
+		Mat H = findHomography(obj, scene, CV_RANSAC);
+		//Finds a perspective transformation between two planes
+
+		//Get the corners from the image_1 ( the object to be "detected" )
+		vector<Point2f> obj_corners(4);
+		obj_corners[0] = cvPoint(0, 0); obj_corners[1] = cvPoint(object.cols, 0);
+		obj_corners[2] = cvPoint(object.cols, object.rows); obj_corners[3] = cvPoint(0, object.rows);
+		vector<Point2f> scene_corners(4);
+
+		perspectiveTransform(obj_corners, scene_corners, H);
+		//Performs the perspective matrix transformation of vectors.
+
+		//Draw lines between the corners (the mapped object in the scene - image_2 )
+		line(img_matches, scene_corners[0] + Point2f(object.cols, 0), scene_corners[1] + Point2f(object.cols, 0), Scalar(0, 0, 255), 2);
+		line(img_matches, scene_corners[1] + Point2f(object.cols, 0), scene_corners[2] + Point2f(object.cols, 0), Scalar(0, 255, 0), 2);
+		line(img_matches, scene_corners[2] + Point2f(object.cols, 0), scene_corners[3] + Point2f(object.cols, 0), Scalar(255, 0, 0), 2);
+		line(img_matches, scene_corners[3] + Point2f(object.cols, 0), scene_corners[0] + Point2f(object.cols, 0), Scalar(0, 255, 255), 2);
+
+		temp = min_dist;
+		if (i == 0) min = temp;
+
+		if (min >= temp) {
+			min = temp;
+			img_matches.copyTo(find);
+		}
+
+		printf("min %f\n", min);
+
+		/*imshow("MatchingResult", img_matches);
+		int key = cvWaitKey(10);
+		if (key == 27) {
+			break;
+		}*/
+	}
+
+	imshow("result", find);
+	waitKey();
+	system("pause");
 	return 0;
 }

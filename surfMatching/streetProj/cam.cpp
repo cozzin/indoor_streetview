@@ -1,4 +1,4 @@
-#define MAX_CAM 4
+#define MAX_CAM 2
 
 #include "opencv2\core\core.hpp"
 #include "opencv2\highgui\highgui.hpp"
@@ -113,7 +113,7 @@ int main(int argc, char *argv[]){
 
 	vector<Mat> images; // 파노라마 전 vector에 저장
 	Mat panorama; // 파노라마 출력 이미지
-	const char win_name[MAX_CAM][10] = { "CAM1", "CAM2", "CAM3", "CAM4" };
+	const char win_name[MAX_CAM][10] = { "CAM1", "CAM2"};
 	const char finalWinName[10] = "PANORAMA";
 	double fps = 20;
 	char x;
